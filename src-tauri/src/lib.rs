@@ -1,7 +1,10 @@
 // Prism - GitHub PR Menu Bar App
 // Main Tauri Application
 
-use tauri::{tray::TrayIconBuilder, Manager, WindowEvent};
+use tauri::{
+    tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent},
+    Manager, PhysicalPosition, WindowEvent,
+};
 
 mod github;
 
@@ -54,12 +57,44 @@ pub fn run() {
                 .icon(app.default_window_icon().unwrap().clone())
                 .tooltip("Prism - GitHub PRs")
                 .on_tray_icon_event(|tray, event| {
-                    if let tauri::tray::TrayIconEvent::Click { .. } = event {
+                    // Only handle left click release (not press)
+                    if let TrayIconEvent::Click {
+                        button: MouseButton::Left,
+                        button_state: MouseButtonState::Up,
+                        ..
+                    } = event
+                    {
                         let app = tray.app_handle();
                         if let Some(window) = app.get_webview_window("main") {
                             if window.is_visible().unwrap_or(false) {
                                 let _ = window.hide();
                             } else {
+                                // Position window near tray icon (centered below it)
+                                if let Ok(Some(rect)) = tray.rect() {
+                                    let window_width: f64 = 380.0;
+                                    // Get physical position values
+                                    let tray_x = match rect.position {
+                                        tauri::Position::Physical(p) => p.x as f64,
+                                        tauri::Position::Logical(l) => l.x,
+                                    };
+                                    let tray_y = match rect.position {
+                                        tauri::Position::Physical(p) => p.y as f64,
+                                        tauri::Position::Logical(l) => l.y,
+                                    };
+                                    let tray_width = match rect.size {
+                                        tauri::Size::Physical(p) => p.width as f64,
+                                        tauri::Size::Logical(l) => l.width,
+                                    };
+                                    let tray_height = match rect.size {
+                                        tauri::Size::Physical(p) => p.height as f64,
+                                        tauri::Size::Logical(l) => l.height,
+                                    };
+
+                                    let x = tray_x - (window_width / 2.0) + (tray_width / 2.0);
+                                    let y = tray_y + tray_height + 5.0;
+                                    let _ = window
+                                        .set_position(PhysicalPosition::new(x as i32, y as i32));
+                                }
                                 let _ = window.show();
                                 let _ = window.set_focus();
                             }
@@ -71,9 +106,19 @@ pub fn run() {
             Ok(())
         })
         .on_window_event(|window, event| {
-            // Hide window when it loses focus (menu bar app behavior)
-            if let WindowEvent::Focused(false) = event {
-                let _ = window.hide();
+            match event {
+                // Hide window when it loses focus (menu bar app behavior)
+                WindowEvent::Focused(false) => {
+                    // Small delay to prevent immediate hide after show
+                    let window = window.clone();
+                    std::thread::spawn(move || {
+                        std::thread::sleep(std::time::Duration::from_millis(100));
+                        if !window.is_focused().unwrap_or(true) {
+                            let _ = window.hide();
+                        }
+                    });
+                }
+                _ => {}
             }
         })
         .run(tauri::generate_context!())

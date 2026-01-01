@@ -97,6 +97,16 @@ function setupEventListeners() {
  * Check if user is authenticated
  */
 async function checkAuthStatus() {
+  // DEV_MODE: Set to true to preview UI with mock data
+  const DEV_MODE = true;
+
+  if (DEV_MODE) {
+    isAuthenticated = true;
+    showMainView();
+    useMockData();
+    return;
+  }
+
   try {
     const token = await invoke("get_github_token");
     if (token) {
