@@ -285,17 +285,6 @@ body {
   letter-spacing: 0.05em;
 }
 
-.section-count {
-  font-size: var(--font-size-xs);
-  color: var(--text-muted);
-}
-
-.section-icon {
-  width: 10px;
-  height: 10px;
-  opacity: 0.3;
-}
-
 /* PR Item - Compact Single Line */
 .pr-item {
   display: flex;
@@ -371,13 +360,6 @@ body {
   padding: var(--space-xs) var(--space-md);
   font-size: var(--font-size-xs);
   color: var(--text-muted);
-}
-
-/* Divider */
-.divider {
-  height: 1px;
-  background: var(--glass-border);
-  margin: var(--space-xs) var(--space-md);
 }
 
 /* Footer Actions */

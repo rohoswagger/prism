@@ -80,10 +80,6 @@ const elements = {
   approvedList: null,
   waitingList: null,
   draftsList: null,
-  reviewCount: null,
-  approvedCount: null,
-  waitingCount: null,
-  draftsCount: null,
 };
 
 // Initialize app when DOM is ready
@@ -109,10 +105,6 @@ function initializeElements() {
   elements.approvedList = document.getElementById("approved-list");
   elements.waitingList = document.getElementById("waiting-list");
   elements.draftsList = document.getElementById("drafts-list");
-  elements.reviewCount = document.getElementById("review-count");
-  elements.approvedCount = document.getElementById("approved-count");
-  elements.waitingCount = document.getElementById("waiting-count");
-  elements.draftsCount = document.getElementById("drafts-count");
 }
 
 /**
@@ -317,12 +309,6 @@ function useMockData() {
  * Render pull requests to the DOM
  */
 function renderPullRequests() {
-  // Update counts
-  elements.reviewCount.textContent = `(${pullRequests.needsReview.length})`;
-  elements.approvedCount.textContent = `(${pullRequests.approved.length})`;
-  elements.waitingCount.textContent = `(${pullRequests.waitingForReviewers.length})`;
-  elements.draftsCount.textContent = `(${pullRequests.drafts.length})`;
-
   // Render each section
   renderPRList(elements.reviewList, pullRequests.needsReview, "needs-review");
   renderPRList(elements.approvedList, pullRequests.approved, "approved");
