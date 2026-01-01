@@ -142,7 +142,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--space-md) var(--space-lg);
+  padding: var(--space-sm) var(--space-lg);
   border-bottom: 1px solid var(--glass-border);
 }
 
@@ -400,7 +400,7 @@ body {
 
 /* Empty State - Compact */
 .empty-state {
-  padding: 2px var(--space-lg);
+  padding: var(--space-xs) var(--space-lg);
   font-size: var(--font-size-xs);
   color: var(--text-muted);
 }
@@ -421,7 +421,7 @@ body {
   display: flex;
   align-items: center;
   gap: var(--space-sm);
-  padding: 4px var(--space-lg);
+  padding: var(--space-xs) var(--space-lg);
   cursor: pointer;
   transition: background var(--transition-fast);
   color: var(--text-secondary);
