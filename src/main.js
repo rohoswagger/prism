@@ -18,18 +18,23 @@ async function resizeWindowToContent() {
     const appContainer = document.querySelector(".app-container");
     if (!appContainer) return;
 
-    // Calculate content height by summing children to avoid flex container issues
-    const header = document.querySelector(".header");
-    const mainContent = document.querySelector(".main-content");
-    const footer = document.querySelector(".footer");
+    const connectionScreen = document.getElementById("connection-screen");
+    const mainView = document.getElementById("main-view");
 
     let totalHeight = 0;
-    if (header) totalHeight += header.offsetHeight;
-    if (footer) totalHeight += footer.offsetHeight;
 
-    // For main content, we want the scroll height (actual content)
-    // We add a small buffer for borders/padding
-    if (mainContent) totalHeight += mainContent.scrollHeight;
+    // Check which view is visible
+    if (connectionScreen && !connectionScreen.classList.contains("hidden")) {
+      totalHeight += connectionScreen.scrollHeight;
+    } else if (mainView && !mainView.classList.contains("hidden")) {
+      const header = document.querySelector(".header");
+      const mainContent = document.querySelector(".main-content");
+      const footer = document.querySelector(".footer");
+
+      if (header) totalHeight += header.offsetHeight;
+      if (footer) totalHeight += footer.offsetHeight;
+      if (mainContent) totalHeight += mainContent.scrollHeight;
+    }
 
     // Add border/padding of container
     const style = window.getComputedStyle(appContainer);
