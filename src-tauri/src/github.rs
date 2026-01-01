@@ -184,7 +184,7 @@ pub async fn fetch_pull_requests() -> Result<PullRequestData, String> {
           }
         }
       }
-      search(query: "is:pr is:open review-requested:@me", type: ISSUE, first: 50) {
+            search(query: "is:pr is:open review-requested:@me", type: ISSUE, first: 50) {
         nodes {
           ... on PullRequest {
             number
@@ -197,6 +197,15 @@ pub async fn fetch_pull_requests() -> Result<PullRequestData, String> {
             author {
               login
               avatarUrl
+            }
+            reviewRequests(first: 10) {
+              nodes {
+                requestedReviewer {
+                  ... on User {
+                    login
+                  }
+                }
+              }
             }
           }
         }
@@ -224,11 +233,27 @@ pub async fn fetch_pull_requests() -> Result<PullRequestData, String> {
     let mut waiting_for_reviewers = Vec::new();
     let mut drafts = Vec::new();
 
+    let viewer_login = data["data"]["viewer"]["login"]
+        .as_str()
+        .ok_or("Failed to get viewer login")?;
+
     // PRs that need my review (from search)
     if let Some(nodes) = data["data"]["search"]["nodes"].as_array() {
         for node in nodes {
-            if let Some(pr) = parse_pr_node(node) {
-                needs_review.push(pr);
+            // Check if explicitly requested (not via team)
+            let is_direct_request = node["reviewRequests"]["nodes"]
+                .as_array()
+                .map(|requests| {
+                    requests
+                        .iter()
+                        .any(|r| r["requestedReviewer"]["login"].as_str() == Some(viewer_login))
+                })
+                .unwrap_or(false);
+
+            if is_direct_request {
+                if let Some(pr) = parse_pr_node(node) {
+                    needs_review.push(pr);
+                }
             }
         }
     }
