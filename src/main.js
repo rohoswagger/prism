@@ -18,12 +18,33 @@ async function resizeWindowToContent() {
     const appContainer = document.querySelector(".app-container");
     if (!appContainer) return;
 
-    // Calculate content height
-    const contentHeight = appContainer.scrollHeight;
+    // Calculate content height by summing children to avoid flex container issues
+    const header = document.querySelector(".header");
+    const mainContent = document.querySelector(".main-content");
+    const footer = document.querySelector(".footer");
+
+    let totalHeight = 0;
+    if (header) totalHeight += header.offsetHeight;
+    if (footer) totalHeight += footer.offsetHeight;
+
+    // For main content, we want the scroll height (actual content)
+    // We add a small buffer for borders/padding
+    if (mainContent) totalHeight += mainContent.scrollHeight;
+
+    // Add border/padding of container
+    const style = window.getComputedStyle(appContainer);
+    totalHeight +=
+      parseFloat(style.paddingTop) +
+      parseFloat(style.paddingBottom) +
+      parseFloat(style.borderTopWidth) +
+      parseFloat(style.borderBottomWidth);
+
     const targetHeight = Math.min(
-      Math.max(contentHeight, MIN_WINDOW_HEIGHT),
+      Math.max(totalHeight, MIN_WINDOW_HEIGHT),
       MAX_WINDOW_HEIGHT
     );
+
+    console.log(`Resizing to: ${targetHeight} (Total content: ${totalHeight})`);
 
     const win = getCurrentWindow();
     const size = await win.innerSize();
