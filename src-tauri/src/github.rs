@@ -69,39 +69,36 @@ fn store_token(token: &str) -> Result<(), String> {
 /// This works entirely locally - user gets a code to enter on GitHub's website
 pub async fn start_device_flow() -> Result<String, String> {
     let client = reqwest::Client::new();
-    
+
     // Step 1: Request device and user codes
     let response = client
         .post(DEVICE_CODE_URL)
         .header("Accept", "application/json")
-        .form(&[
-            ("client_id", GITHUB_CLIENT_ID),
-            ("scope", "repo read:user"),
-        ])
+        .form(&[("client_id", GITHUB_CLIENT_ID), ("scope", "repo read:user")])
         .send()
         .await
         .map_err(|e| format!("Failed to request device code: {}", e))?;
-    
+
     let device_response: DeviceCodeResponse = response
         .json()
         .await
         .map_err(|e| format!("Failed to parse device code response: {}", e))?;
-    
+
     // Step 2: Open browser for user to enter the code
     let _ = open::that(&device_response.verification_uri);
-    
-    println!("Please enter code: {} at {}", 
-        device_response.user_code, 
-        device_response.verification_uri
+
+    println!(
+        "Please enter code: {} at {}",
+        device_response.user_code, device_response.verification_uri
     );
-    
+
     // Step 3: Poll for access token
     let interval = std::time::Duration::from_secs(device_response.interval as u64);
     let max_attempts = device_response.expires_in / device_response.interval;
-    
+
     for _ in 0..max_attempts {
         tokio::time::sleep(interval).await;
-        
+
         let token_response = client
             .post(ACCESS_TOKEN_URL)
             .header("Accept", "application/json")
@@ -113,17 +110,17 @@ pub async fn start_device_flow() -> Result<String, String> {
             .send()
             .await
             .map_err(|e| format!("Failed to request access token: {}", e))?;
-        
+
         let token_data: AccessTokenResponse = token_response
             .json()
             .await
             .map_err(|e| format!("Failed to parse access token response: {}", e))?;
-        
+
         if let Some(token) = token_data.access_token {
             store_token(&token)?;
             return Ok(token);
         }
-        
+
         // If error is not "authorization_pending", stop polling
         if let Some(error) = &token_data.error {
             if error != "authorization_pending" && error != "slow_down" {
@@ -131,7 +128,7 @@ pub async fn start_device_flow() -> Result<String, String> {
             }
         }
     }
-    
+
     Err("OAuth flow timed out".to_string())
 }
 
@@ -139,7 +136,7 @@ pub async fn start_device_flow() -> Result<String, String> {
 pub async fn fetch_pull_requests() -> Result<PullRequestData, String> {
     let token = get_stored_token().ok_or("Not authenticated")?;
     let client = reqwest::Client::new();
-    
+
     // GraphQL query to fetch PRs
     let query = r#"
     query {
@@ -188,7 +185,7 @@ pub async fn fetch_pull_requests() -> Result<PullRequestData, String> {
       }
     }
     "#;
-    
+
     let response = client
         .post(GRAPHQL_URL)
         .header("Authorization", format!("Bearer {}", token))
@@ -197,18 +194,18 @@ pub async fn fetch_pull_requests() -> Result<PullRequestData, String> {
         .send()
         .await
         .map_err(|e| format!("Failed to fetch PRs: {}", e))?;
-    
+
     let data: serde_json::Value = response
         .json()
         .await
         .map_err(|e| format!("Failed to parse response: {}", e))?;
-    
+
     // Parse the response
     let mut needs_review = Vec::new();
     let mut approved = Vec::new();
     let mut waiting_for_reviewers = Vec::new();
     let mut drafts = Vec::new();
-    
+
     // PRs that need my review (from search)
     if let Some(nodes) = data["data"]["search"]["nodes"].as_array() {
         for node in nodes {
@@ -217,7 +214,7 @@ pub async fn fetch_pull_requests() -> Result<PullRequestData, String> {
             }
         }
     }
-    
+
     // My PRs
     if let Some(nodes) = data["data"]["viewer"]["pullRequests"]["nodes"].as_array() {
         for node in nodes {
@@ -227,10 +224,9 @@ pub async fn fetch_pull_requests() -> Result<PullRequestData, String> {
                     .as_array()
                     .map(|reviews| reviews.iter().any(|r| r["state"] == "APPROVED"))
                     .unwrap_or(false);
-                let has_review_requests = node["reviewRequests"]["totalCount"]
-                    .as_i64()
-                    .unwrap_or(0) > 0;
-                
+                let has_review_requests =
+                    node["reviewRequests"]["totalCount"].as_i64().unwrap_or(0) > 0;
+
                 if is_draft {
                     drafts.push(pr);
                 } else if has_approval {
@@ -244,7 +240,7 @@ pub async fn fetch_pull_requests() -> Result<PullRequestData, String> {
             }
         }
     }
-    
+
     Ok(PullRequestData {
         needs_review,
         approved,

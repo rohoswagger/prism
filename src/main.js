@@ -290,15 +290,7 @@ function renderPRList(container, prs, type) {
   if (!container) return;
 
   if (prs.length === 0) {
-    container.innerHTML = `
-      <div class="empty-state">
-        <svg class="empty-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
-          <path d="M8 12h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-        </svg>
-        <span class="empty-text">No pull requests</span>
-      </div>
-    `;
+    container.innerHTML = `<div class="empty-state">None</div>`;
     return;
   }
 
@@ -318,24 +310,15 @@ function renderPRList(container, prs, type) {
 function createPRItem(pr, type) {
   const statusBadge =
     pr.status === "approved"
-      ? '<span class="pr-status-badge approved">✓ Approved</span>'
+      ? '<svg class="pr-status-check" width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17L4 12" stroke="#4ade80" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>'
       : pr.status === "changes_requested"
-      ? '<span class="pr-status-badge changes">Changes requested</span>'
+      ? '<span class="pr-status-badge changes">Changes</span>'
       : "";
 
   return `
     <div class="pr-item ${type} fade-in">
-      <img class="pr-avatar" src="${pr.avatar}" alt="${
-    pr.author
-  }" loading="lazy" />
-      <div class="pr-content">
-        <div class="pr-number">PR #${pr.number}</div>
-        <div class="pr-title">${escapeHtml(pr.title)}</div>
-        <div class="pr-meta">
-          <span class="pr-repo">${pr.repo}</span>
-          ${statusBadge}
-        </div>
-      </div>
+      <div class="pr-title">${escapeHtml(pr.title)}</div>
+      ${statusBadge}
     </div>
   `;
 }

@@ -71,7 +71,7 @@ pub fn run() {
                             } else {
                                 // Position window near tray icon (centered below it)
                                 if let Ok(Some(rect)) = tray.rect() {
-                                    let window_width: f64 = 380.0;
+                                    let window_width: f64 = 340.0;
                                     // Get physical position values
                                     let tray_x = match rect.position {
                                         tauri::Position::Physical(p) => p.x as f64,
