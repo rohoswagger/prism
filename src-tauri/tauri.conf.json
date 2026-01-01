@@ -17,13 +17,13 @@
       {
         "title": "Prism",
         "width": 340,
-        "height": 420,
+        "height": 400,
         "resizable": false,
         "decorations": false,
         "transparent": true,
         "alwaysOnTop": true,
         "visible": false,
-        "skipTaskbar": true,
+        "skipTaskbar": false,
         "center": true
       }
     ],

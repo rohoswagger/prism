@@ -5,6 +5,36 @@
 
 // Get Tauri APIs
 const { invoke } = window.__TAURI__.core;
+const { getCurrentWindow } = window.__TAURI__.window;
+
+const MAX_WINDOW_HEIGHT = 400;
+const MIN_WINDOW_HEIGHT = 200;
+
+/**
+ * Resize window to fit content
+ */
+async function resizeWindowToContent() {
+  try {
+    const appContainer = document.querySelector(".app-container");
+    if (!appContainer) return;
+
+    // Calculate content height
+    const contentHeight = appContainer.scrollHeight;
+    const targetHeight = Math.min(
+      Math.max(contentHeight, MIN_WINDOW_HEIGHT),
+      MAX_WINDOW_HEIGHT
+    );
+
+    const win = getCurrentWindow();
+    const size = await win.innerSize();
+
+    if (Math.abs(size.height - targetHeight) > 5) {
+      await win.setSize({ width: 340, height: targetHeight });
+    }
+  } catch (e) {
+    console.log("Could not resize window:", e);
+  }
+}
 
 // State
 let isAuthenticated = false;
@@ -281,6 +311,9 @@ function renderPullRequests() {
     "waiting"
   );
   renderPRList(elements.draftsList, pullRequests.drafts, "draft");
+
+  // Resize window to fit content
+  setTimeout(resizeWindowToContent, 50);
 }
 
 /**
