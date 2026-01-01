@@ -1,11 +1,7 @@
 // Prism - GitHub PR Menu Bar App
 // Main Tauri Application
 
-use tauri::{
-    menu::{Menu, MenuItem},
-    tray::TrayIconBuilder,
-    Manager, WindowEvent,
-};
+use tauri::{tray::TrayIconBuilder, Manager, WindowEvent};
 
 mod github;
 
@@ -71,7 +67,7 @@ pub fn run() {
                     }
                 })
                 .build(app)?;
-            
+
             Ok(())
         })
         .on_window_event(|window, event| {

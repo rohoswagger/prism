@@ -2,11 +2,12 @@
   "$schema": "https://schema.tauri.app/config/2",
   "productName": "Prism",
   "version": "0.1.0",
-  "identifier": "com.prism.app",
+  "identifier": "com.prism.dev",
   "build": {
     "frontendDist": "../src"
   },
   "app": {
+    "macOSPrivateApi": true,
     "withGlobalTauri": true,
     "trayIcon": {
       "iconPath": "icons/icon.png",
