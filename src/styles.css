@@ -487,3 +487,35 @@ body {
     opacity: 0.5;
   }
 }
+
+/* Connection Code */
+.connection-code {
+  margin-top: var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm);
+  animation: fadeIn 0.3s ease-out;
+  width: 100%;
+}
+
+.code-instruction {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+}
+
+.code-box {
+  background: var(--surface-hover);
+  border: 1px solid var(--glass-border);
+  padding: var(--space-md) var(--space-xl);
+  border-radius: var(--radius-md);
+  font-family: monospace;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  color: var(--text-primary);
+  letter-spacing: 0.1em;
+  user-select: text;
+  text-align: center;
+  width: 100%;
+  max-width: 200px;
+}

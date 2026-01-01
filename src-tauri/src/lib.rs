@@ -15,8 +15,17 @@ fn get_github_token() -> Result<String, String> {
 }
 
 #[tauri::command]
-async fn start_github_oauth() -> Result<String, String> {
-    github::start_device_flow().await
+async fn request_device_code() -> Result<github::DeviceAuthParams, String> {
+    github::request_device_code().await
+}
+
+#[tauri::command]
+async fn poll_for_token(
+    device_code: String,
+    interval: i32,
+    expires_in: i32,
+) -> Result<String, String> {
+    github::poll_for_token(device_code, interval, expires_in).await
 }
 
 #[tauri::command]
@@ -45,7 +54,8 @@ pub fn run() {
         .plugin(tauri_plugin_opener::init())
         .invoke_handler(tauri::generate_handler![
             get_github_token,
-            start_github_oauth,
+            request_device_code,
+            poll_for_token,
             fetch_pull_requests,
             open_github,
             open_url,

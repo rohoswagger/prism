@@ -80,6 +80,8 @@ const elements = {
   approvedList: null,
   waitingList: null,
   draftsList: null,
+  connectionCodeDisplay: null,
+  deviceCode: null,
 };
 
 // Initialize app when DOM is ready
@@ -105,6 +107,10 @@ function initializeElements() {
   elements.approvedList = document.getElementById("approved-list");
   elements.waitingList = document.getElementById("waiting-list");
   elements.draftsList = document.getElementById("drafts-list");
+  elements.connectionCodeDisplay = document.getElementById(
+    "connection-code-display"
+  );
+  elements.deviceCode = document.getElementById("device-code");
 }
 
 /**
@@ -141,7 +147,8 @@ function setupEventListeners() {
  */
 async function checkAuthStatus() {
   // DEV_MODE: Set to true to preview UI with mock data
-  const DEV_MODE = true;
+  // DEV_MODE: Set to true to preview UI with mock data
+  const DEV_MODE = false;
 
   if (DEV_MODE) {
     isAuthenticated = true;
@@ -169,20 +176,59 @@ async function checkAuthStatus() {
  * Handle GitHub connection
  */
 async function handleConnect() {
-  showLoading(true);
+  const DEV_MODE = false;
 
-  try {
-    // Start OAuth flow
-    await invoke("start_github_oauth");
+  if (DEV_MODE) {
     isAuthenticated = true;
     showMainView();
-    await fetchPullRequests();
+    // useMockData();
+    return;
+  }
+
+  // UI Setup for Code Flow
+  elements.connectBtn.classList.add("hidden");
+  elements.connectionCodeDisplay.classList.remove("hidden");
+  elements.deviceCode.textContent = "Loading...";
+
+  try {
+    // 1. Request Code
+    const authParams = await invoke("request_device_code");
+
+    // 2. Display Code
+    elements.deviceCode.textContent = authParams.user_code;
+
+    // 3. Poll for Token
+    const token = await invoke("poll_for_token", {
+      deviceCode: authParams.device_code,
+      interval: authParams.interval,
+      expiresIn: authParams.expires_in,
+    });
+
+    if (token) {
+      isAuthenticated = true;
+      showMainView();
+      await fetchPullRequests();
+    } else {
+      throw new Error("No token received");
+    }
   } catch (error) {
-    console.error("Failed to connect:", error);
-    showConnectionScreen();
-    // Could show error toast here
-  } finally {
-    showLoading(false);
+    console.error("Authentication failed:", error);
+
+    // Reset UI
+    elements.connectBtn.classList.remove("hidden");
+    elements.connectionCodeDisplay.classList.add("hidden");
+
+    // Show error only if it's not a user cancellation (which isn't really possible here unless closed)
+    // Maybe show a simple alert or toast if we had one.
+    // changing connection title temporarily to show error
+    const title = document.querySelector(".connection-title");
+    const originalText = title.textContent;
+    title.textContent = "Connection Failed. Try again.";
+    title.style.color = "var(--status-failure)";
+    setTimeout(() => {
+      title.textContent = originalText;
+      title.style.color = "";
+    }, 3000);
   }
 }
 
@@ -243,7 +289,12 @@ async function fetchPullRequests() {
   } catch (error) {
     console.error("Failed to fetch PRs:", error);
     // Use mock data for development
-    useMockData();
+    // useMockData();
+    // Show error state or toast in future
+    if (error.includes("Not authenticated") || error.includes("401")) {
+      isAuthenticated = false;
+      showConnectionScreen();
+    }
   }
 }
 

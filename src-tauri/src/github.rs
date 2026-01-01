@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 use std::fs;
 use std::path::PathBuf;
 
-const GITHUB_CLIENT_ID: &str = "Ov23liUkXjGnMzhLzpLr"; // Prism OAuth App - replace with your own
+const GITHUB_CLIENT_ID: &str = "Ov23linS1ksKP0B1DrVC";
 const DEVICE_CODE_URL: &str = "https://github.com/login/device/code";
 const ACCESS_TOKEN_URL: &str = "https://github.com/login/oauth/access_token";
 const GRAPHQL_URL: &str = "https://api.github.com/graphql";
@@ -65,9 +65,17 @@ fn store_token(token: &str) -> Result<(), String> {
     fs::write(path, token).map_err(|e| e.to_string())
 }
 
-/// Start GitHub Device Flow OAuth
-/// This works entirely locally - user gets a code to enter on GitHub's website
-pub async fn start_device_flow() -> Result<String, String> {
+#[derive(Debug, Serialize)]
+pub struct DeviceAuthParams {
+    pub user_code: String,
+    pub verification_uri: String,
+    pub device_code: String,
+    pub interval: i32,
+    pub expires_in: i32,
+}
+
+/// Request GitHub Device Flow code
+pub async fn request_device_code() -> Result<DeviceAuthParams, String> {
     let client = reqwest::Client::new();
 
     // Step 1: Request device and user codes
@@ -87,24 +95,34 @@ pub async fn start_device_flow() -> Result<String, String> {
     // Step 2: Open browser for user to enter the code
     let _ = open::that(&device_response.verification_uri);
 
-    println!(
-        "Please enter code: {} at {}",
-        device_response.user_code, device_response.verification_uri
-    );
+    Ok(DeviceAuthParams {
+        user_code: device_response.user_code,
+        verification_uri: device_response.verification_uri,
+        device_code: device_response.device_code,
+        interval: device_response.interval,
+        expires_in: device_response.expires_in,
+    })
+}
 
-    // Step 3: Poll for access token
-    let interval = std::time::Duration::from_secs(device_response.interval as u64);
-    let max_attempts = device_response.expires_in / device_response.interval;
+/// Poll for access token
+pub async fn poll_for_token(
+    device_code: String,
+    interval: i32,
+    expires_in: i32,
+) -> Result<String, String> {
+    let client = reqwest::Client::new();
+    let interval_duration = std::time::Duration::from_secs(interval as u64);
+    let max_attempts = expires_in / interval;
 
     for _ in 0..max_attempts {
-        tokio::time::sleep(interval).await;
+        tokio::time::sleep(interval_duration).await;
 
         let token_response = client
             .post(ACCESS_TOKEN_URL)
             .header("Accept", "application/json")
             .form(&[
                 ("client_id", GITHUB_CLIENT_ID),
-                ("device_code", &device_response.device_code),
+                ("device_code", &device_code),
                 ("grant_type", "urn:ietf:params:oauth:grant-type:device_code"),
             ])
             .send()
