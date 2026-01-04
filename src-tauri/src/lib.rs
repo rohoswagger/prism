@@ -116,19 +116,16 @@ pub fn run() {
             Ok(())
         })
         .on_window_event(|window, event| {
-            match event {
+            if let WindowEvent::Focused(false) = event {
                 // Hide window when it loses focus (menu bar app behavior)
-                WindowEvent::Focused(false) => {
-                    // Small delay to prevent immediate hide after show
-                    let window = window.clone();
-                    std::thread::spawn(move || {
-                        std::thread::sleep(std::time::Duration::from_millis(100));
-                        if !window.is_focused().unwrap_or(true) {
-                            let _ = window.hide();
-                        }
-                    });
-                }
-                _ => {}
+                // Small delay to prevent immediate hide after show
+                let window = window.clone();
+                std::thread::spawn(move || {
+                    std::thread::sleep(std::time::Duration::from_millis(100));
+                    if !window.is_focused().unwrap_or(true) {
+                        let _ = window.hide();
+                    }
+                });
             }
         })
         .run(tauri::generate_context!())

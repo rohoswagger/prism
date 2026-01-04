@@ -96,17 +96,6 @@ function setupEventListeners() {
  * Check if user is authenticated
  */
 async function checkAuthStatus() {
-  // DEV_MODE: Set to true to preview UI with mock data
-  // DEV_MODE: Set to true to preview UI with mock data
-  const DEV_MODE = false;
-
-  if (DEV_MODE) {
-    isAuthenticated = true;
-    showMainView();
-    useMockData();
-    return;
-  }
-
   try {
     const token = await invoke("get_github_token");
     if (token) {
@@ -126,15 +115,6 @@ async function checkAuthStatus() {
  * Handle GitHub connection
  */
 async function handleConnect() {
-  const DEV_MODE = false;
-
-  if (DEV_MODE) {
-    isAuthenticated = true;
-    showMainView();
-    // useMockData();
-    return;
-  }
-
   // UI Setup for Code Flow
   elements.connectBtn.classList.add("hidden");
   elements.connectionCodeDisplay.classList.remove("hidden");
@@ -168,9 +148,7 @@ async function handleConnect() {
     elements.connectBtn.classList.remove("hidden");
     elements.connectionCodeDisplay.classList.add("hidden");
 
-    // Show error only if it's not a user cancellation (which isn't really possible here unless closed)
-    // Maybe show a simple alert or toast if we had one.
-    // changing connection title temporarily to show error
+    // Temporarily show error in connection title
     const title = document.querySelector(".connection-title");
     const originalText = title.textContent;
     title.textContent = "Connection Failed. Try again.";
@@ -238,72 +216,11 @@ async function fetchPullRequests() {
     renderPullRequests();
   } catch (error) {
     console.error("Failed to fetch PRs:", error);
-    // Use mock data for development
-    // useMockData();
-    // Show error state or toast in future
     if (error.includes("Not authenticated") || error.includes("401")) {
       isAuthenticated = false;
       showConnectionScreen();
     }
   }
-}
-
-/**
- * Use mock data for development/preview
- */
-function useMockData() {
-  pullRequests = {
-    needsReview: [
-      {
-        number: 17603,
-        title: "feat(keyboard): Add employees-only preference for keyboard ads",
-        repo: "company/app",
-        author: "alice",
-        avatar: "https://avatars.githubusercontent.com/u/1?v=4",
-        url: "https://github.com/company/app/pull/17603",
-      },
-      {
-        number: 17601,
-        title:
-          "chore(websubmit): switch around flex layout to avoid explicit margin",
-        repo: "company/app",
-        author: "bob",
-        avatar: "https://avatars.githubusercontent.com/u/2?v=4",
-        url: "https://github.com/company/app/pull/17601",
-      },
-      {
-        number: 17591,
-        title: "fix(websubmit): use consistent ordering for reviewer list",
-        repo: "company/app",
-        author: "carol",
-        avatar: "https://avatars.githubusercontent.com/u/3?v=4",
-        url: "https://github.com/company/app/pull/17591",
-      },
-      {
-        number: 17586,
-        title: "refactor: split out reviewer into a reusable component",
-        repo: "company/app",
-        author: "david",
-        avatar: "https://avatars.githubusercontent.com/u/4?v=4",
-        url: "https://github.com/company/app/pull/17586",
-      },
-    ],
-    approved: [
-      {
-        number: 17254,
-        title: "make server dockerfile use same calling directory as local env",
-        repo: "company/server",
-        author: "eve",
-        avatar: "https://avatars.githubusercontent.com/u/5?v=4",
-        url: "https://github.com/company/server/pull/17254",
-        status: "approved",
-      },
-    ],
-    waitingForReviewers: [],
-    drafts: [],
-  };
-
-  renderPullRequests();
 }
 
 /**

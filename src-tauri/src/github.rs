@@ -267,16 +267,12 @@ pub async fn fetch_pull_requests() -> Result<PullRequestData, String> {
                     .as_array()
                     .map(|reviews| reviews.iter().any(|r| r["state"] == "APPROVED"))
                     .unwrap_or(false);
-                let has_review_requests =
-                    node["reviewRequests"]["totalCount"].as_i64().unwrap_or(0) > 0;
 
                 if is_draft {
                     drafts.push(pr);
                 } else if has_approval {
                     pr.status = Some("approved".to_string());
                     approved.push(pr);
-                } else if has_review_requests {
-                    waiting_for_reviewers.push(pr);
                 } else {
                     waiting_for_reviewers.push(pr);
                 }
