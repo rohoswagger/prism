@@ -7,61 +7,6 @@
 const { invoke } = window.__TAURI__.core;
 const { getCurrentWindow } = window.__TAURI__.window;
 
-const MAX_WINDOW_HEIGHT = 400;
-const MIN_WINDOW_HEIGHT = 200;
-
-/**
- * Resize window to fit content
- */
-async function resizeWindowToContent() {
-  try {
-    const appContainer = document.querySelector(".app-container");
-    if (!appContainer) return;
-
-    const connectionScreen = document.getElementById("connection-screen");
-    const mainView = document.getElementById("main-view");
-
-    let totalHeight = 0;
-
-    // Check which view is visible
-    if (connectionScreen && !connectionScreen.classList.contains("hidden")) {
-      totalHeight += connectionScreen.scrollHeight;
-    } else if (mainView && !mainView.classList.contains("hidden")) {
-      const header = document.querySelector(".header");
-      const mainContent = document.querySelector(".main-content");
-      const footer = document.querySelector(".footer");
-
-      if (header) totalHeight += header.offsetHeight;
-      if (footer) totalHeight += footer.offsetHeight;
-      if (mainContent) totalHeight += mainContent.scrollHeight;
-    }
-
-    // Add border/padding of container
-    const style = window.getComputedStyle(appContainer);
-    totalHeight +=
-      parseFloat(style.paddingTop) +
-      parseFloat(style.paddingBottom) +
-      parseFloat(style.borderTopWidth) +
-      parseFloat(style.borderBottomWidth);
-
-    const targetHeight = Math.min(
-      Math.max(totalHeight, MIN_WINDOW_HEIGHT),
-      MAX_WINDOW_HEIGHT
-    );
-
-    console.log(`Resizing to: ${targetHeight} (Total content: ${totalHeight})`);
-
-    const win = getCurrentWindow();
-    const size = await win.innerSize();
-
-    if (Math.abs(size.height - targetHeight) > 5) {
-      await win.setSize({ width: 340, height: targetHeight });
-    }
-  } catch (e) {
-    console.log("Could not resize window:", e);
-  }
-}
-
 // State
 let isAuthenticated = false;
 let pullRequests = {
@@ -374,9 +319,6 @@ function renderPullRequests() {
     "waiting"
   );
   renderPRList(elements.draftsList, pullRequests.drafts, "draft");
-
-  // Resize window to fit content
-  setTimeout(resizeWindowToContent, 50);
 }
 
 /**
