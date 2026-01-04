@@ -13,7 +13,7 @@
       {
         "title": "Prism",
         "width": 340,
-        "height": 400,
+        "height": 300,
         "resizable": false,
         "decorations": false,
         "transparent": true,

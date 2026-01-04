@@ -150,14 +150,14 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--space-sm) var(--space-md);
+  padding: var(--space-xs) var(--space-sm);
   border-bottom: 1px solid var(--glass-border);
 }
 
 .header-title {
   display: flex;
   align-items: center;
-  gap: var(--space-sm);
+  gap: var(--space-xs);
   font-size: var(--font-size-md);
   font-weight: var(--font-weight-medium);
   color: var(--text-secondary);
@@ -199,7 +199,7 @@ body {
 .connection-icon {
   width: 48px;
   height: 48px;
-  margin-bottom: var(--space-md);
+  margin-bottom: var(--space-sm);
   opacity: 0.4;
 }
 
@@ -213,7 +213,7 @@ body {
 .connection-subtitle {
   font-size: var(--font-size-sm);
   color: var(--text-tertiary);
-  margin-bottom: var(--space-xl);
+  margin-bottom: var(--space-md);
   max-width: 260px;
   line-height: 1.6;
 }
@@ -222,8 +222,8 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: var(--space-sm);
-  padding: var(--space-md) var(--space-xl);
+  gap: var(--space-xs);
+  padding: var(--space-sm) var(--space-md);
   background: var(--bg-secondary);
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-md);
@@ -281,8 +281,8 @@ body {
 .section-header {
   display: flex;
   align-items: center;
-  gap: var(--space-sm);
-  padding: var(--space-xs) var(--space-md);
+  gap: var(--space-xs);
+  padding: 2px var(--space-sm);
 }
 
 .section-title {
@@ -298,8 +298,8 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--space-sm);
-  padding: var(--space-xs) var(--space-md);
+  gap: var(--space-xs);
+  padding: 2px var(--space-sm);
   cursor: pointer;
   transition: background var(--transition-fast);
   border-left: 2px solid transparent;
@@ -365,7 +365,7 @@ body {
 
 /* Empty State - Compact */
 .empty-state {
-  padding: var(--space-xs) var(--space-md);
+  padding: 2px var(--space-sm);
   font-size: var(--font-size-xs);
   color: var(--text-muted);
 }
@@ -378,8 +378,8 @@ body {
 .footer-action {
   display: flex;
   align-items: center;
-  gap: var(--space-sm);
-  padding: var(--space-xs) var(--space-md);
+  gap: var(--space-xs);
+  padding: var(--space-xs) var(--space-sm);
   cursor: pointer;
   transition: background var(--transition-fast);
   color: var(--text-secondary);
