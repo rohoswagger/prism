@@ -6,4 +6,4 @@ A menu bar app vibe coded in tauri for easy access to all your github prs. inspi
 
 `npm install && npm run tauri build`
 
-<img width="334" height="397" alt="Screenshot 2026-01-04 at 15 22 09" src="https://github.com/user-attachments/assets/23cf0638-5c80-4533-992c-819b21c05e97" />
+<img width="276" height="303" alt="Screenshot 2026-01-04 at 15 57 38" src="https://github.com/user-attachments/assets/355780bb-7ee9-4f8a-bfb5-989a61d81e55" />
