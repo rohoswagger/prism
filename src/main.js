@@ -310,26 +310,56 @@ function useMockData() {
  * Render pull requests to the DOM
  */
 function renderPullRequests() {
+  // Get section elements
+  const reviewSection = document.getElementById("section-review");
+  const approvedSection = document.getElementById("section-approved");
+  const waitingSection = document.getElementById("section-waiting");
+  const draftsSection = document.getElementById("section-drafts");
+
   // Render each section
-  renderPRList(elements.reviewList, pullRequests.needsReview, "needs-review");
-  renderPRList(elements.approvedList, pullRequests.approved, "approved");
+  renderPRList(
+    elements.reviewList,
+    pullRequests.needsReview,
+    "needs-review",
+    reviewSection
+  );
+  renderPRList(
+    elements.approvedList,
+    pullRequests.approved,
+    "approved",
+    approvedSection
+  );
   renderPRList(
     elements.waitingList,
     pullRequests.waitingForReviewers,
-    "waiting"
+    "waiting",
+    waitingSection
   );
-  renderPRList(elements.draftsList, pullRequests.drafts, "draft");
+  renderPRList(
+    elements.draftsList,
+    pullRequests.drafts,
+    "draft",
+    draftsSection
+  );
 }
 
 /**
  * Render a list of PRs
  */
-function renderPRList(container, prs, type) {
+function renderPRList(container, prs, type, section) {
   if (!container) return;
 
   if (prs.length === 0) {
-    container.innerHTML = `<div class="empty-state">None</div>`;
+    // Hide the entire section if there are no PRs
+    if (section) {
+      section.classList.add("hidden");
+    }
     return;
+  }
+
+  // Show the section if it has PRs
+  if (section) {
+    section.classList.remove("hidden");
   }
 
   container.innerHTML = prs.map((pr) => createPRItem(pr, type)).join("");

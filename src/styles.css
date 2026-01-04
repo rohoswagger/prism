@@ -58,11 +58,11 @@
   /* Typography */
   --font-family: "Inter", -apple-system, BlinkMacSystemFont, system-ui,
     sans-serif;
-  --font-size-xs: 10px;
-  --font-size-sm: 11px;
-  --font-size-md: 12px;
-  --font-size-lg: 13px;
-  --font-size-xl: 15px;
+  --font-size-xs: 11px;
+  --font-size-sm: 12px;
+  --font-size-md: 13px;
+  --font-size-lg: 14px;
+  --font-size-xl: 16px;
   --font-weight-normal: 400;
   --font-weight-medium: 500;
   --font-weight-semibold: 600;
@@ -276,6 +276,13 @@ body {
 /* Section */
 .section {
   padding: 0;
+  padding-bottom: var(--space-xs);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.section:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
 }
 
 .section-header {
